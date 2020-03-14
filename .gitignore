@@ -82,7 +82,7 @@ typings/
 .nuxt
 
 # Typescript build
-dist
+lib
 
 # Gatsby files
 .cache/

@@ -2,19 +2,20 @@
   "compilerOptions": {
     "target": "es5",
     "module": "commonjs",
-    "lib": [
-      "es2017",
-      "es7",
-      "es6",
-      "dom"
-    ],
     "declaration": true,
-    "outDir": "dist",
+    "outDir": "./lib",
     "strict": true,
-    "esModuleInterop": true
+    "lib": [
+      "ESNext",
+      "ES2020",
+      "DOM"
+    ]
   },
+  "include": [
+    "src"
+  ],
   "exclude": [
     "node_modules",
-    "dist"
+    "**/__tests__/*"
   ]
 }

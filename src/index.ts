@@ -78,6 +78,6 @@ class Laratable {
 interface Column {
   name: string;
   searchable?: boolean;
-} 
+}
 
 export default Laratable;

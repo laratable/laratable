@@ -23,7 +23,7 @@ class Laratable {
     validator.run(selector, options);
 
     const builder = new LaratableBuilder();
-    builder.run(validator.validated(), options); 
+    builder.run(validator.validated(), options);
   }
 }
 

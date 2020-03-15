@@ -43,17 +43,19 @@ __IMPORTANT:__ _By semantic its meant to have __TABLE > THEAD > TR > TD|TH__ HTM
 And instanciate `Laratable` with some required options:
 
 ```
+import Laratable from '@laratable/laratable';
+
 Laratable.view('.laratable', {
   url: '/employees',
   columns: [
-    { name: 'id', },
-    { name: 'first_name', },
-    { name: 'last_name', },
+    { name: 'id' },
+    { name: 'first_name' },
+    { name: 'last_name' },
     { name: 'birth_date' },
-    { name: 'gender', },
-    { name: 'actions', searchable: false, orderable: false, }
-  ],
-});
+    { name: 'gender' },
+    { name: 'actions', searchable: false, orderable: false }
+  ]
+}); 
 
 ```
 
@@ -61,9 +63,12 @@ The API is too simple, just pay attention and you'll figure it out by yourself.
 
 
 
-# Styling
+# Styling and Theming
 
-Since it's just a wrapper for your tables, you can use whatever styles you already have. Just for the sake of practicality, this guide uses Bootstrap 4.
+Since it's just a wrapper for your tables, you can use whatever styles you already have. 
+
+Just for the sake of practicality, this guide uses Bootstrap 4.
+
 Don't feel shy to use the CSS framework you love!
 
 

@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "noImplicitAny": true,
     "target": "es5",
     "module": "commonjs",
     "declaration": true,
@@ -8,7 +9,12 @@
     "lib": [
       "ESNext",
       "ES2020",
-      "DOM"
+      "ES2019",
+      "ES2018",
+      "ES2017",
+      "ES2016",
+      "ES2015",
+      "DOM",
     ]
   },
   "include": [

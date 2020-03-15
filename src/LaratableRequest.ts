@@ -1,5 +1,5 @@
 import axios from 'axios';
-import LaratableOptionsInterface from './LaratableOptionsInterface';
+import LaratableRequestConfigsInterface from './LaratableRequestOptionsInterface';
 
 /**
  * LaratableRequest
@@ -11,12 +11,13 @@ class LaratableRequest {
   /**
    * Requests Eloquent's resource through Ajax.
    *
-   * @param {LaratableOptionsInterface} options
+   * @param {LaratableConfigsInterface} options
    * @memberof LaratableRequest
    */
-  public run(options: LaratableOptionsInterface) {
+  public run(options: LaratableRequestConfigsInterface): void {
     axios.get(options.url).then(response => {
       const data = response.data;
+      console.log(data);
     });
   }
 }

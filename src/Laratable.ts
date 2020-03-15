@@ -1,6 +1,7 @@
-import LaratableOptions from './LaratableOptionsInterface';
+import LaratableConfigsInterface from './LaratableConfigsInterface';
 import LaratableValidator from './LaratableValidator';
 import LaratableBuilder from './LaratableBuilder';
+import LaratableRequest from './LaratableRequest';
 
 /**
  * Laratable
@@ -15,15 +16,22 @@ class Laratable {
    *
    * @static
    * @param {string} selector
-   * @param {LaratableOptions} options
+   * @param {LaratableConfigs} configs
    * @memberof Laratable
    */
-  static view(selector: string, options: LaratableOptions) {
+  static view(selector: string, configs: LaratableConfigsInterface): void {
     const validator = new LaratableValidator();
-    validator.run(selector, options);
+    validator.run(selector, configs);
 
     const builder = new LaratableBuilder();
-    builder.run(validator.validated(), options);
+    builder.run(validator.validated(), configs);
+
+    const request = new LaratableRequest();
+
+    request.run({
+      url: configs.url,
+      orderBy: configs.options?.orderBy
+    });
   }
 }
 

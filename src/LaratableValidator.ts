@@ -1,4 +1,4 @@
-import LaratableOptionsInterface from './LaratableOptionsInterface';
+import LaratableConfigsInterface from './LaratableConfigsInterface';
 import LaratableColumnInterface from './LaratableColumnInterface';
 
 /**
@@ -20,10 +20,10 @@ class LaratableValidator {
    * Validates the Laratable options.
    *
    * @param {string} selector
-   * @param {LaratableOptionsInterface} options
+   * @param {LaratableConfigsInterface} options
    * @memberof LaratableValidator
    */
-  public run(selector: string, options: LaratableOptionsInterface) {
+  public run(selector: string, options: LaratableConfigsInterface): void {
     /**
      * Let's check if you've passed a valid selector.
      */
@@ -111,7 +111,7 @@ class LaratableValidator {
    * @returns
    * @memberof LaratableValidator
    */
-  public validated() {
+  public validated(): NodeList {
     return this.$columns;
   }
 }

@@ -1,4 +1,4 @@
-import LaratableColumnInterface from './LaratableColumnInterface'; 
+import LaratableColumnInterface from './LaratableColumnInterface';
 import LaratableConfigsOptionsInterface from './LaratableConfigsOptionsInterface';
 
 /**

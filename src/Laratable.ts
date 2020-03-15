@@ -30,7 +30,7 @@ class Laratable {
 
     request.run({
       url: configs.url,
-      orderBy: configs.options?.orderBy
+      orderBy: configs.options?.orderBy,
     });
   }
 }

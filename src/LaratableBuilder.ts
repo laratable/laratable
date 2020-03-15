@@ -8,7 +8,6 @@ import LaratableRequest from './LaratableRequest';
  * @class LaratableBuilder
  */
 class LaratableBuilder {
-
   $columns!: NodeList;
   options!: LaratableConfigsInterface;
 
@@ -33,13 +32,14 @@ class LaratableBuilder {
    * @memberof LaratableBuilder
    */
   private addEvents(): void {
-
     const columns = this.$columns;
 
     for (const index in Object.keys(columns)) {
       const column = columns[index];
 
-      if (column.nodeType !== 1) { continue }
+      if (column.nodeType !== 1) {
+        continue;
+      }
 
       ((element: Node): void => {
         column.addEventListener('click', (): void => {
@@ -50,7 +50,6 @@ class LaratableBuilder {
   }
 
   private listenColumnClick($column: Node): void {
-
     const $e = $column as HTMLTableCellElement;
 
     const index = $e.cellIndex;

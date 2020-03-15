@@ -1,4 +1,4 @@
-import Laratable from '../laratable';
+import Laratable from '../index';
 
 test('Constructor testing', () => {
   document.body.innerHTML = `<table class="laratable"><thead><tr><td>Name</td><td>Acions</td></tr></thead></table>`;

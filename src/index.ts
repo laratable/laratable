@@ -1,11 +1,6 @@
 import axios from 'axios';
 
-interface Column {
-  name: string;
-  searchable?: boolean;
-}
-
-export default class Laratable {
+class Laratable {
   constructor(selector: string, url: string, columns: Column[], options = {}) {
     /**
      * Let's check if you've passed a valid selector.
@@ -75,7 +70,14 @@ export default class Laratable {
     });
   }
 
-  parse(column: Node) {
+  private parse(column: Node) {
     // console.log(column);
   }
 }
+
+interface Column {
+  name: string;
+  searchable?: boolean;
+} 
+
+export default Laratable;

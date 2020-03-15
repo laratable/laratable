@@ -2,19 +2,13 @@ import Laratable from '../index';
 
 test('Constructor testing', () => {
   document.body.innerHTML = `<table class="laratable"><thead><tr><td>Name</td><td>Acions</td></tr></thead></table>`;
-  const table = new Laratable(
-    '.laratable',
-    'test.html',
-    [
-      {
-        name: 'name',
-      },
-      {
-        name: 'actions',
-        searchable: false,
-      },
+  const table = Laratable.view('.laratable', {
+    url: 'test.html',
+    columns: [
+      { name: 'name', },
+      { name: 'actions', orderable: false, searchable: false, },
     ],
-    {},
-  );
-  expect(table).toBeInstanceOf(Laratable);
+    options: {},
+  });
+  expect(table).toBeUndefined();
 });

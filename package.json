@@ -1,6 +1,6 @@
 {
   "name": "@laratable/laratable",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A Vanilla JS AJAX Library to make dynamic HTML Tables for Laravel's Eloquent.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

@@ -17,13 +17,13 @@ class LaratableValidator {
   public $columns!: NodeList;
 
   /**
-   * Validates the Laratable options.
+   * Validates the Laratable configs.
    *
    * @param {string} selector
-   * @param {LaratableConfigsInterface} options
+   * @param {LaratableConfigsInterface} configs
    * @memberof LaratableValidator
    */
-  public run(selector: string, options: LaratableConfigsInterface): void {
+  public run(selector: string, configs: LaratableConfigsInterface): void {
     /**
      * Let's check if you've passed a valid selector.
      */
@@ -85,7 +85,7 @@ class LaratableValidator {
 
     const columnsMappings: LaratableColumnInterface[] = [];
 
-    for (const column of options.columns) {
+    for (const column of configs.columns) {
       columnsMappings.push(column);
     }
 

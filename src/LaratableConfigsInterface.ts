@@ -11,6 +11,7 @@ interface LaratableConfigsInterface {
   url: string;
   columns: LaratableColumnInterface[];
   options?: LaratableConfigsOptionsInterface;
+  selector?: string;
 }
 
 export default LaratableConfigsInterface;

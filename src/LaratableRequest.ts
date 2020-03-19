@@ -1,5 +1,6 @@
-import axios from 'axios';
-import LaratableRequestConfigsInterface from './LaratableRequestOptionsInterface';
+/* eslint-disable @typescript-eslint/camelcase */
+import axios, { AxiosResponse } from 'axios';
+import LaratableResponseJsonInterface from './LaratableResponseJsonInterface';
 
 /**
  * LaratableRequest
@@ -11,14 +12,32 @@ class LaratableRequest {
   /**
    * Requests Eloquent's resource through Ajax.
    *
-   * @param {LaratableConfigsInterface} options
+   * @param {string} url
+   * @returns {Promise<LaratableResponseJsonInterface>}
    * @memberof LaratableRequest
    */
-  public run(options: LaratableRequestConfigsInterface): void {
-    axios.get(options.url).then(response => {
-      const data = response.data;
-      console.log(data);
-    });
+  async run(url: string): Promise<LaratableResponseJsonInterface> {
+    return await axios
+      .get<LaratableResponseJsonInterface>(url)
+      .then((response: AxiosResponse<LaratableResponseJsonInterface>) => {
+        const { data } = response;
+
+        const state: LaratableResponseJsonInterface = {
+          current_page: data.current_page,
+          data: data.data,
+          first_page_url: data.first_page_url,
+          from: data.from,
+          last_page_url: data.last_page_url,
+          next_page_url: data.next_page_url,
+          path: data.path,
+          per_page: data.per_page,
+          prev_page_url: data.prev_page_url,
+          to: data.to,
+          total: data.total,
+        };
+
+        return state;
+      });
   }
 }
 

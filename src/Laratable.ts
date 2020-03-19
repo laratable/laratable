@@ -1,8 +1,6 @@
 import LaratableConfigsInterface from './LaratableConfigsInterface';
 import LaratableValidator from './LaratableValidator';
 import LaratableBuilder from './LaratableBuilder';
-import LaratableRequest from './LaratableRequest';
-
 /**
  * Laratable
  * is a Vanilla JS AJAX Library to make
@@ -21,17 +19,32 @@ class Laratable {
    */
   static view(selector: string, configs: LaratableConfigsInterface): void {
     const validator = new LaratableValidator();
-    validator.run(selector, configs);
+
+    const _configs = {
+      url: configs.url,
+      columns: configs.columns,
+      options: {
+        showInfo: configs.options?.showInfo ?? false,
+        simplePagine: configs.options?.simplePaginate ?? false,
+        onEachEdge: configs.options?.onEachEdge ?? 2,
+        onEachSide: configs.options?.onEachSide ?? 3,
+        prevLabel: configs.options?.prevAriaLabel ?? `‹`,
+        prevAriaLabel: configs.options?.prevAriaLabel ?? `« Previous`,
+        nextLabel: configs.options?.prevAriaLabel ?? `›`,
+        nextAriaLabel: configs.options?.prevAriaLabel ?? `Next »`,
+        withPath: configs.options?.withPath ?? '',
+        appends: configs.options?.appends ?? [],
+        paginationClassSelector: configs.options?.paginationClassSelector ?? `pagination`,
+        loadingClassSelector: configs.options?.loadingClassSelector ?? `loading`,
+        containerIdSelector: configs.options?.containerIdSelector ?? `laratableContainer`,
+      },
+      selector: selector,
+    };
+
+    validator.run(selector, _configs);
 
     const builder = new LaratableBuilder();
-    builder.run(validator.validated(), configs);
-
-    const request = new LaratableRequest();
-
-    request.run({
-      url: configs.url,
-      orderBy: configs.options?.orderBy,
-    });
+    builder.run(validator.validated(), _configs);
   }
 }
 

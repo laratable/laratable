@@ -24,6 +24,10 @@ class LaratableResults {
     return this._results.current_page;
   }
 
+  currentPageUrl(): string {
+    return this.url(this.currentPage());
+  }
+
   firstItem(): number {
     return this._results.from;
   }
@@ -52,10 +56,11 @@ class LaratableResults {
 
     if (diff === 1) left = left - 1;
 
-    const _range = range(left, right);
+    if (left < 0) left = 1;
 
     const pages: LaratableResultPageInterface[] = [];
 
+    const _range = range(left, right);
     _range.forEach((page: number) => {
       pages.push({
         value: page,

@@ -48,11 +48,9 @@ class LaratablePaginate {
       $li.setAttribute('aria-disabled', 'true');
       $li.classList.add('disabled');
       $a.setAttribute('aria-hidden', 'true');
-      console.log(page.text);
     }
 
     if (currentPage === lastPage && ariaLabel.length > 0) {
-      console.log(currentPage, lastPage);
       $li.setAttribute('aria-disabled', 'true');
       $li.classList.add('disabled');
       $a.setAttribute('aria-hidden', 'true');
@@ -70,8 +68,13 @@ class LaratablePaginate {
     return $li;
   }
 
-  public render($table: HTMLTableElement, configs: LaratableConfigsInterface, results: LaratableResults): void {
-    const paginationSelector = configs.options?.paginationClassSelector ?? '';
+  public render(
+    $table: HTMLTableElement,
+    $footer: HTMLElement,
+    configs: LaratableConfigsInterface,
+    results: LaratableResults,
+  ): void {
+    const paginationSelector = `.${configs.options?.containerClassSelector} footer ul`;
     const onEachEdge = configs.options?.onEachEdge ?? 0;
     const onEachSide = configs.options?.onEachSide ?? 0;
     const prevLabel = configs.options?.prevLabel ?? '';
@@ -79,8 +82,7 @@ class LaratablePaginate {
     const nextLabel = configs.options?.nextLabel ?? '';
     const nextAriaLabel = configs.options?.nextAriaLabel ?? '';
 
-    const $nav = document.createElement('nav');
-    const $currentUl = document.querySelector(`.${paginationSelector}`);
+    const $currentUl = document.querySelector(`${paginationSelector}`);
     const $ul = $currentUl ? $currentUl : document.createElement('ul');
 
     if ($currentUl) {
@@ -88,7 +90,10 @@ class LaratablePaginate {
         $currentUl.removeChild($currentUl.firstChild);
       }
     } else {
-      $ul.classList.add(paginationSelector);
+      const classList = configs.options?.paginationClassSelector?.split(' ');
+      classList?.forEach(className => {
+        $ul.classList.add(className);
+      });
     }
 
     const currentPage = results.currentPage();
@@ -118,10 +123,13 @@ class LaratablePaginate {
     }
 
     const pages = results.getUrlRange(counter, onEachEdge, onEachSide);
+    const totalPages = pages.length;
 
     let _page = 0;
 
     for (const page of pages) {
+      if (totalPages === 1) continue;
+
       _page = page.value;
 
       const $li = this.createLink(page, currentPage);
@@ -136,7 +144,7 @@ class LaratablePaginate {
     for (let i = onEachEdge - 1; i >= 0; i--) {
       const page = lastPage - i;
 
-      if (page <= _page) continue;
+      if (totalPages === 1 || page <= _page) continue;
 
       const $li = this.createLink({ value: page, href: `${results.url(page)}` }, currentPage);
       $ul.appendChild($li);
@@ -151,9 +159,9 @@ class LaratablePaginate {
     );
 
     $ul.appendChild($nextLi);
-    $nav.appendChild($ul);
+    $footer.appendChild($ul);
 
-    $table.parentElement?.insertBefore($nav, $table.nextSibling);
+    $table.parentElement?.insertBefore($footer, $table.nextSibling);
   }
 }
 

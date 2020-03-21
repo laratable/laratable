@@ -3,6 +3,7 @@ import LaratableRequest from './LaratableRequest';
 import LaratablePaginate from './LaratablePaginate';
 import LaratableResponseJsonInterface from './LaratableResponseJsonInterface';
 import LaratableResults from './LaratableResult';
+import { debounce } from './debounce';
 
 /**
  * LaratableBuilder
@@ -12,12 +13,21 @@ import LaratableResults from './LaratableResult';
  */
 class LaratableBuilder {
   $container!: HTMLDivElement;
+  $header!: HTMLElement;
+  $search!: HTMLElement;
   $table!: HTMLTableElement;
+  $footer!: HTMLElement;
+  $info!: HTMLElement;
   $columns!: NodeList;
   configs!: LaratableConfigsInterface;
   response!: Promise<LaratableResponseJsonInterface>;
   results!: LaratableResults;
-  static queryString = '';
+  private static queryString: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private static orderColumn: any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private static orderDirection: any[];
+  private static searchValue = '';
 
   /**
    * Adds events to Laratable columns.
@@ -29,7 +39,11 @@ class LaratableBuilder {
   public run($columns: NodeList, configs: LaratableConfigsInterface): void {
     this.$columns = $columns;
     this.configs = configs;
-    this.response = this.makeResponse(configs.url);
+
+    this.buildQueryString();
+
+    this.response = this.makeResponse(this.buildUrl(configs.url));
+
     this.make();
   }
 
@@ -53,9 +67,13 @@ class LaratableBuilder {
 
         this.$table = document.querySelector(`${configs.selector}`) as HTMLTableElement;
 
-        this.makeContainer();
+        if (!this.$container) this.makeContainer();
+        if (!this.$header) this.makeHeader();
+        if (!this.$search) this.makeSearch();
         this.makeTHead();
         this.makeTBody();
+        if (!this.$footer) this.makeFooter();
+        this.makeInfo();
         this.makePagination();
       })
       .catch(() => {
@@ -70,9 +88,9 @@ class LaratableBuilder {
    * @memberof LaratableBuilder
    */
   private makeContainer(): void {
-    const containerIdSelector = this.configs.options?.containerIdSelector;
+    const containerClassSelector = this.configs.options?.containerClassSelector;
 
-    const $currentContainer = document.querySelector(`#${containerIdSelector}`) as HTMLDivElement;
+    const $currentContainer = document.querySelector(`.${containerClassSelector}`) as HTMLDivElement;
 
     if ($currentContainer) {
       while ($currentContainer.firstChild) {
@@ -81,12 +99,86 @@ class LaratableBuilder {
       this.$container = $currentContainer;
     } else {
       const $container = document.createElement('div');
-      $container.setAttribute('id', `${containerIdSelector}`);
+      $container.classList.add(`${containerClassSelector}`);
       this.$container = $container;
     }
 
     this.$table.parentNode?.insertBefore(this.$container, this.$table);
     this.$container.appendChild(this.$table);
+  }
+
+  /**
+   * Makes the nav container for info and pagination.
+   *
+   * @private
+   * @memberof LaratableBuilder
+   */
+  private makeHeader(): void {
+    const $header = document.createElement('header');
+
+    const classList = this.configs.options?.headerClassSelector?.split(' ');
+    classList?.forEach(className => {
+      $header.classList.add(className);
+    });
+
+    this.$table.parentNode?.insertBefore($header, this.$table);
+
+    this.$header = $header;
+  }
+
+  /**
+   * Makes the search.
+   *
+   * @private
+   * @memberof LaratableBuilder
+   */
+  private makeSearch(): void {
+    const $search = document.createElement('div');
+
+    const containerClassList = this.configs.options?.searchContainerClassSelector?.split(' ');
+
+    containerClassList?.forEach(className => {
+      $search.classList.add(className);
+    });
+
+    const $input = document.createElement('input') as HTMLInputElement;
+    $input.setAttribute('type', 'search');
+
+    const inputClassList = this.configs.options?.searchInputClassSelector?.split(' ');
+
+    inputClassList?.forEach(className => {
+      $input.classList.add(className);
+    });
+
+    $search.appendChild($input);
+    this.$search = $search;
+
+    this.$header.appendChild($search);
+
+    $input?.addEventListener(
+      'keyup',
+      debounce((event: Event) => {
+        event.stopImmediatePropagation();
+        this.listenSearchKeyup($input);
+      }, 250),
+    );
+  }
+
+  /**
+   * Makes the nav container for info and pagination.
+   *
+   * @private
+   * @memberof LaratableBuilder
+   */
+  private makeFooter(): void {
+    const $footer = document.createElement('footer');
+
+    const classList = this.configs.options?.footerClassSelector?.split(' ');
+    classList?.forEach(className => {
+      $footer.classList.add(className);
+    });
+
+    this.$footer = $footer;
   }
 
   /**
@@ -151,7 +243,49 @@ class LaratableBuilder {
       $tbody.appendChild($row);
     }
 
+    if (data.length === 0) {
+      const $column = document.createElement('td');
+      $column.classList.add('empty');
+      const $text = document.createTextNode(`${configs.options?.emptyMessage}`);
+      $column.setAttribute('colspan', `${configs.columns.length}`);
+      $column.appendChild($text);
+
+      const $row = document.createElement('tr');
+      $row.appendChild($column);
+      $tbody.appendChild($column);
+    }
+
     this.$table?.appendChild($tbody);
+  }
+
+  /**
+   * Makes the
+   *
+   * @private
+   * @memberof LaratableBuilder
+   */
+  private makeInfo(): void {
+    if (this.$info) {
+      this.$info.parentNode?.removeChild(this.$info);
+    }
+
+    const $info = document.createElement('div');
+
+    const classList = this.configs.options?.infoClassSelector?.split(' ');
+    classList?.forEach(className => {
+      $info.classList.add(className);
+    });
+
+    const text = `${this.configs.options?.infoMessage}`
+      .replace(':from', `${this.results.firstItem()}`)
+      .replace(':to', `${this.results.lastItem()}`)
+      .replace(':total', `${this.results.count()}`);
+
+    const $text = document.createTextNode(text);
+    $info.appendChild($text);
+
+    this.$info = $info;
+    this.$footer.appendChild($info);
   }
 
   /**
@@ -163,9 +297,11 @@ class LaratableBuilder {
   private makePagination(): void {
     const paginate = new LaratablePaginate();
 
-    paginate.render(this.$table, this.configs, this.results);
+    paginate.render(this.$table, this.$footer, this.configs, this.results);
 
-    const links: NodeList = document.querySelectorAll(`.${this.configs.options?.paginationClassSelector} li a`);
+    const links: NodeList = document.querySelectorAll(
+      `.${this.configs.options?.containerClassSelector} footer ul li a`,
+    );
 
     for (const index in Object.keys(links)) {
       const link = links[index];
@@ -201,6 +337,81 @@ class LaratableBuilder {
   }
 
   /**
+   * Builds the QueryString for the URL on any scenerios.
+   *
+   * @private
+   * @memberof LaratableBuilder
+   */
+  private buildQueryString(): void {
+    const queryOptions: string[] = [];
+    const appends = this.configs.options?.appends ?? {};
+    const appendsKeys = Object.keys((appends as object) ?? []);
+
+    for (const key in appendsKeys) {
+      const appendKey = appendsKeys[key];
+      const appendValue = appends[appendKey];
+      queryOptions.push(`${appendKey}=${appendValue.toString()}`);
+    }
+
+    if (LaratableBuilder.orderColumn) {
+      for (const index in Object.keys(LaratableBuilder.orderColumn)) {
+        const column = LaratableBuilder.orderColumn[index];
+        const direction = LaratableBuilder.orderDirection[index];
+
+        queryOptions.push(`order_column[]=${column}`);
+        queryOptions.push(`order_direction[]=${direction}`);
+      }
+    } else {
+      const columns = this.configs.options?.orderColumn ?? [];
+      const directions = this.configs.options?.orderDirection ?? [];
+
+      columns.forEach(column => {
+        queryOptions.push(`order_column[]=${column}`);
+      });
+
+      directions.forEach(direction => {
+        queryOptions.push(`order_direction[]=${direction}`);
+      });
+    }
+
+    if (LaratableBuilder.searchValue.length > 0) {
+      queryOptions.push(`search=${LaratableBuilder.searchValue}`);
+    }
+
+    LaratableBuilder.queryString = `${queryOptions.join('&')}`;
+  }
+
+  /**
+   * Builds the url with query strig.
+   *
+   * @private
+   * @param {string} url
+   * @returns {string}
+   * @memberof LaratableBuilder
+   */
+  private buildUrl(url: string): string {
+    const qs = LaratableBuilder.queryString;
+
+    return url.includes('?page=') ? `${url?.replace('?', '?' + qs + '&')}` : `${url}?${qs}`;
+  }
+
+  /**
+   * Listen to search input.
+   *
+   * @private
+   * @param {HTMLInputElement} $input
+   * @memberof LaratableBuilder
+   */
+  private listenSearchKeyup($input: HTMLInputElement): void {
+    LaratableBuilder.searchValue = $input.value;
+    this.buildQueryString();
+
+    this.response = this.makeResponse(this.buildUrl(`${this.results.currentPageUrl()}`));
+
+    this.make();
+  }
+
+  /**
    * Listen to click event on links.
    *
    * @private
@@ -209,15 +420,12 @@ class LaratableBuilder {
    */
   private listenLinkClick($link: Node): void {
     const $e = $link as HTMLTableCellElement;
-    let url = $e.getAttribute('href');
+    const url = $e.getAttribute('href');
 
-    const qs = LaratableBuilder.queryString;
+    this.buildQueryString();
 
-    if (qs.length > 0) {
-      url = `${url?.replace('?', '?' + qs + '&')}`;
-    }
+    this.response = this.makeResponse(this.buildUrl(`${url}`));
 
-    this.response = this.makeResponse(`${url}`);
     this.make();
   }
 
@@ -244,41 +452,36 @@ class LaratableBuilder {
     const sortingAsc = $e.classList.contains('sorting_asc');
     const sortingDesc = $e.classList.contains('sorting_desc');
 
-    if (!sortingAsc) {
-      const $sorting = document.querySelector(`${this.configs.selector} thead .sorting_asc`);
-      $sorting?.classList.remove('sorting_asc');
-    }
+    const $allSortings = document.querySelectorAll(`${configs.selector} thead tr *`);
 
-    if (!$e.classList.contains('sorting_asc')) {
-      $e.classList.add('sorting_asc');
-    }
+    $allSortings.forEach($element => {
+      $element.classList.remove('sorting_asc');
+      $element.classList.remove('sorting_desc');
+    });
 
     let sorting = 'asc';
 
     if (sortingAsc) {
-      $e.classList.remove('sorting_asc');
       $e.classList.add('sorting_desc');
       sorting = 'desc';
     }
 
-    if (sortingDesc) {
+    if (sortingDesc || (!sortingAsc && !sortingDesc)) {
       $e.classList.add('sorting_asc');
-      $e.classList.remove('sorting_desc');
     }
 
-    const queryOptions: string[] = [];
-    queryOptions.push(`order_column[]=${column.name}`);
-    queryOptions.push(`order_direction[]=${sorting}`);
+    /**
+     * In this case order must be reset.
+     */
+    LaratableBuilder.orderColumn = [`${column.name}`];
+    LaratableBuilder.orderDirection = [`${sorting}`];
 
-    const appends = Object.keys(configs.options?.appends ?? []);
+    const url = `${configs.url}`;
 
-    LaratableBuilder.queryString = `${queryOptions.join('&')}`;
+    this.buildQueryString();
 
-    const queryString = appends.length ? `?${appends}&${queryOptions.join('&')}` : `?${queryOptions.join('&')}`;
+    this.response = this.makeResponse(this.buildUrl(`${url}`));
 
-    const url = `${configs.url}${queryString}`;
-
-    this.response = this.makeResponse(`${url}`);
     this.make();
   }
 }

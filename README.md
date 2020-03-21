@@ -1,4 +1,4 @@
-> :warning **This package is under development and may be unstable**: Don't blame me for that!
+> :warning: **This package is under development and may be unstable**: Don't blame me for that!
 
 # Laratable
 

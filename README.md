@@ -1,3 +1,5 @@
+:warning **This package is under development and may be unstable**: Don't blame me for that!
+
 # Laratable
 
 A Vanilla JS AJAX Library to make dynamic HTML Tables for Laravel's Eloquent.
@@ -48,13 +50,26 @@ import Laratable from '@laratable/laratable';
 Laratable.view('.laratable', {
   url: '/employees',
   columns: [
-    { name: 'id' },
+    { name: 'emp_no' },
     { name: 'first_name' },
     { name: 'last_name' },
     { name: 'birth_date' },
     { name: 'gender' },
-    { name: 'actions', searchable: false, orderable: false }
-  ]
+    { name: 'actions', searchable: false, orderable: false },
+  ],
+  options: {
+    orderColumn: ['first_name', 'last_name'],
+    orderDirection: ['asc', 'asc'],
+    appends: { module: 'test', build: false },
+    containerClassSelector: 'laratable-container',
+    searchContainerClassSelector: 'laratable-search-container',
+    searchInputClassSelector: 'laratable-search-input',
+    footerClassSelector: 'laratable-footer',
+    infoClassSelector: 'laratable-info',
+    paginationClassSelector: 'laratable-pagination pagination',
+    infoMessage: 'Exibindo :from a :to de :total resultados',
+    emptyMessage: 'Não foram encontrados resultados'
+  }
 }); 
 
 ```

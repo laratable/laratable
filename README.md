@@ -24,7 +24,7 @@ You can install Laratable as any ordinary NPM package:
 Then, you need to have a view rendering a semantic table: 
 
 
-```
+```html
  <table class="laratable table table-bordered">
       <thead>
         <tr>
@@ -42,9 +42,9 @@ Then, you need to have a view rendering a semantic table:
 __IMPORTANT:__ _By semantic its meant to have __TABLE > THEAD > TR > TD|TH__ HTML Elements. If the table is somehow not displayed, please check you browser's console in order to get detailed error messages to help you correct any possible mistakes._
 
 
-And instanciate `Laratable` with some required options:
+And instantiate `Laratable` with some required options:
 
-```
+```ts
 import Laratable from '@laratable/laratable';
 
 Laratable.view('.laratable', {
